@@ -2,7 +2,7 @@
   "name": "key-manager-iot-backend",
   "version": "1.0.0",
   "description": "Backend do projeto de gerenciamento de chaves - IOT",
-  "main": "app.js",
+  "main": "./src/app.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -13,7 +13,8 @@
   "license": "ISC",
   "dependencies": {
     "dotenv": "^16.0.3",
-    "express": "^4.18.2"
+    "express": "^4.18.2",
+    "mongoose": "^7.2.1"
   },
   "devDependencies": {
     "nodemon": "^2.0.22"
