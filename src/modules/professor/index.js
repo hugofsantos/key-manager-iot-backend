@@ -2,8 +2,24 @@ import {ProfessorRepository} from './repositories/professorRepository.js';
 import {ProfessorService} from './professorService.js';
 import {ProfessorController} from './professorController.js';
 
-const professorRepository = new ProfessorRepository();
-const professorService = new ProfessorService(professorRepository);
-const professorController = new ProfessorController(professorService);
+let professorServiceInstance = null;
+let professorControllerInstance = null;
 
-export default professorController;
+export function getProfessorServiceInstance() {
+  if(!professorServiceInstance)
+    professorServiceInstance = new ProfessorService(new ProfessorRepository());
+
+  return professorServiceInstance;
+}
+
+export function getProfessorControllerInstance() {
+  if (!professorControllerInstance) {
+    professorControllerInstance = new ProfessorController(getProfessorServiceInstance());
+  }
+
+  return professorControllerInstance;
+}
+
+export const professorService = getProfessorServiceInstance();
+export const professorController = getProfessorControllerInstance();
+

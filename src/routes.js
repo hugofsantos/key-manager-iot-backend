@@ -1,5 +1,5 @@
 import express from 'express';
-import professorController from './modules/professor/index.js';
+import {professorController} from './modules/professor/index.js';
 
 const routes = express.Router();
 
