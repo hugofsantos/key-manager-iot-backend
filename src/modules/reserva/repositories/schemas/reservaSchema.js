@@ -4,7 +4,8 @@ export const reservaSchema = mongoose.Schema({
   professor: { type: mongoose.Schema.Types.ObjectId, ref: 'Professor', required: true },
   datas: [{ type: String }], // Um array de string
   horarioInicial: { type: Number, required: true }, // Tempo inicial (em ms)
-  horarioFinal: { type: Number, required: true }
+  horarioFinal: { type: Number, required: true },
+  sala: {type: String, required: true}
 }, { collection: 'reservas' });
 
-export const reservaModel = mongoose.Model('Reserva', reservaSchema);
+export const reservaModel = mongoose.model('Reserva', reservaSchema);

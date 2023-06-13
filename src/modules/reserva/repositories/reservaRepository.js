@@ -1,14 +1,11 @@
-import { reservaModel } from "./schemas/reservaSchema";
+import { reservaModel } from "./schemas/reservaSchema.js";
 
 export class ReservaRepository {
   constructor() {
     this.model = reservaModel
   }
 
-  async writeOne(reserva) {
-    if(reserva?.horarioInicial >= reserva.horarioFinal)
-      throw new Error('Horários de reserva inválidos!');
-    
+  async writeOne(reserva) {    
     try{
       return await this.model.create(reserva);
     }catch(error) {
@@ -17,24 +14,26 @@ export class ReservaRepository {
   }
 
   async find(filters) {
-    const {professor, horarioInicial, horarioFinal, sala} = filters;
+    const {professor, horarioInicial, horarioFinal, sala, withProfessors} = filters;
 
     try{
-      return await this.model.find({
-        horarioInicial: {$gte: horarioInicial ?? 0},
-        horarioFinal: { $lte: horarioFinal ?? Date.now()},
-        ...(professor & {professor}),
-        ...(sala & {sala})
-      }); 
+      const findObj = {
+        ...((horarioInicial || horarioInicial === 0)  && {horarioInicial: {$gte: horarioInicial}}),
+        ...((horarioFinal || horarioFinal === 0) && { horarioFinal: {$lte: horarioFinal} }),
+        ...(professor && { professor }),
+        ...(sala && { sala })
+      };
+
+      if(withProfessors) 
+        return await this.model.find(findObj).populate('professor').exec();
+
+      return await this.model.find(findObj); 
     }catch(error) {
       throw error;
     }
   }
 
   async findReservasInRange(horarioInicial, horarioFinal, sala) {
-    if(!horarioInicial || !horarioFinal || !sala)
-      throw new Error('Todos os parâmetros (horarioInicial, horarioFinal e Sala) precisam ter valor!');
-
     try {
       return await this.model.find({
         $or: [
@@ -45,6 +44,10 @@ export class ReservaRepository {
           {
             horarioInicial: {$lt: horarioFinal},
             horarioFinal: {$gte: horarioFinal}
+          },
+          {
+           horarioInicial: {$lte: horarioInicial},
+           horarioFinal: {$gte: horarioFinal} 
           }
         ],
         sala 

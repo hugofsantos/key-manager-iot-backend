@@ -1,5 +1,3 @@
-import { response } from "express";
-
 export class ProfessorController {
   constructor (professorService) {
     this.base = '/professor';
@@ -11,7 +9,7 @@ export class ProfessorController {
       const {nome, matricula, uid} = request.body;
 
       const professor = await this.professorService.createProfessor({nome, matricula, uid});
-      response.status(200).json(professor);
+      response.status(201).json(professor);
     }catch(error) {
       response.status(500).json(error);
     }
