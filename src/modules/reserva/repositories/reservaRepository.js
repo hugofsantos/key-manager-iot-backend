@@ -56,4 +56,17 @@ export class ReservaRepository {
       throw error;
     }
   }
+
+  async findReserva(professor, horario, data) {
+    try {
+      return await this.model.find({
+        professor,
+        horarioInicial: {$lte: horario},
+        horarioFinal: {$gt: horario},
+        data: {$in: [data]}
+      }).limit(1)[0] || null;
+    }catch(error) {
+      throw error;
+    }
+  }
 }

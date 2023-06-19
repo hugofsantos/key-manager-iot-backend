@@ -43,6 +43,21 @@ export class ReservaService {
     }
   }
 
+  async getReserva(professorId) {
+    const now = new Date();
+    const nowOnlyWithHoursAndMinutes = new Date(0, 0, 0, now.getHours(), now.getMinutes()); 
+    
+    try {
+      return await this.reservaRepository.findReserva(
+        professorId,
+        nowOnlyWithHoursAndMinutes.getTime(),
+        now.toLocaleDateString('pt-BR')
+      );
+    }catch(error) {
+      throw error;
+    }
+  }    
+
   async #getDatesWithTimeConflict(datas, horarioInicial, horarioFinal, sala) {
     try{
       const reservedDates = new Set();
