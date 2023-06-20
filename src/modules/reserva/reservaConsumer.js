@@ -36,18 +36,20 @@ export class ReservaConsumer {
       const lastEmprestimo = await this.emprestimoService.getLastEmprestimoByProfessorId(professor._id);
 
       if(lastEmprestimo?.horarioDevolucao === null){
+        console.log(`Sala ${lastEmprestimo.sala} devolvida`);
+
         this.clientMQTT.publish(this.baseTopic + '/trancar', lastEmprestimo.sala);
         this.emprestimoService.updateHorarioDevolucao(lastEmprestimo._id);
         return;
       }
 
       const reserva = await this.reservaService.getReserva(professor._id);
-
+      
       if(!reserva) {
         console.error('Esse professor não têm reserva nesse horário!');
         return;
       }
-
+      
       const pendentes = await this.emprestimoService.findPendings({sala: reserva.sala});
 
       if(pendentes?.length) {
@@ -61,8 +63,9 @@ export class ReservaConsumer {
         horarioEmprestimo: Date.now()
       });
 
-      this.clientMQTT.publish(this.baseTopic + "/liberar", reserva.sala);
+      console.log(`Sala ${reserva.sala} emprestada`);
 
+      this.clientMQTT.publish(this.baseTopic + "/liberar", reserva.sala);
     }catch(error) {
       throw error;
     }

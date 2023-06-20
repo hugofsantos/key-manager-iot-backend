@@ -46,7 +46,7 @@ export class ReservaService {
   async getReserva(professorId) {
     const now = new Date();
     const nowOnlyWithHoursAndMinutes = new Date(0, 0, 0, now.getHours(), now.getMinutes()); 
-    
+
     try {
       return await this.reservaRepository.findReserva(
         professorId,

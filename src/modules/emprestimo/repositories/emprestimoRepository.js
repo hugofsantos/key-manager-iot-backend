@@ -15,7 +15,7 @@ export class EmprestimoRepository {
 
   async getLastEmprestimoByProfessorId(professor) {
     try {
-      return await this.model.find({professor}).sort('-horarioEmprestimo').limit(1)[0];
+      return (await this.model.find({professor}).sort('-horarioEmprestimo').limit(1))[0];
     }catch(error) {
       throw error;
     }
@@ -28,7 +28,8 @@ export class EmprestimoRepository {
       return await this.model.find({
         ... ((inicio || inicio === 0) & {horarioEmprestimo: {$gte: inicio}}),
         ... ((fim || fim === 0) & { horarioEmprestimo: { $lte: fim } }),
-        ... (sala & {sala})
+        ... (sala & {sala}),
+        horarioDevolucao: null
       });
     }catch(error) {
       throw error;
