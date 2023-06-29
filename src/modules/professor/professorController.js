@@ -11,6 +11,7 @@ export class ProfessorController {
       const professor = await this.professorService.createProfessor({nome, matricula, uid});
       response.status(201).json(professor);
     }catch(error) {
+      console.error(error.message);
       response.status(500).json(error);
     }
   }
