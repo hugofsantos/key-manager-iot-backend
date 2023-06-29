@@ -49,7 +49,7 @@ export class ReservaConsumer {
         console.error('Esse professor não têm reserva nesse horário!');
         return;
       }
-      
+
       const pendentes = await this.emprestimoService.findPendings({sala: reserva.sala});
 
       if(pendentes?.length) {

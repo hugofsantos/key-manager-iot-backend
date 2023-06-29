@@ -26,9 +26,9 @@ export class EmprestimoRepository {
       const { inicio, fim, sala } = filters;
 
       return await this.model.find({
-        ... ((inicio || inicio === 0) & {horarioEmprestimo: {$gte: inicio}}),
-        ... ((fim || fim === 0) & { horarioEmprestimo: { $lte: fim } }),
-        ... (sala & {sala}),
+        ... ((inicio || inicio === 0) && {horarioEmprestimo: {$gte: inicio}}),
+        ... ((fim || fim === 0) && { horarioEmprestimo: { $lte: fim } }),
+        ... (sala && {sala}),
         horarioDevolucao: null
       });
     }catch(error) {
