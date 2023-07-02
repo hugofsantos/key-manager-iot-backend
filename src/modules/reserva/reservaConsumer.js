@@ -8,6 +8,7 @@ export class ReservaConsumer {
 
     this.clientMQTT = null;
     this.baseTopic = '';
+    this.sockets = {};
   }
 
   async initConsumer(clientId, brokerUrl, username, password) {
@@ -18,6 +19,7 @@ export class ReservaConsumer {
     
     this.clientMQTT.subscribe(this.baseTopic + '/rfid');
     
+  
     this.clientMQTT.on('message', (topic, message) => {
       if (topic === this.baseTopic + '/rfid')
         this.#onMessageRFID(message.toString());
@@ -26,6 +28,8 @@ export class ReservaConsumer {
 
   async #onMessageRFID(rfid) {
     try{
+      this.sendWebsocketMessage('rfid', rfid);
+
       const [professor] = await this.professorService.findProfessors({uid: rfid});
 
       if(!professor) {
@@ -40,6 +44,7 @@ export class ReservaConsumer {
 
         this.clientMQTT.publish(this.baseTopic + '/trancar', lastEmprestimo.sala);
         this.emprestimoService.updateHorarioDevolucao(lastEmprestimo._id);
+        this.sendWebsocketMessage('trancar', lastEmprestimo.sala);
         return;
       }
 
@@ -57,7 +62,7 @@ export class ReservaConsumer {
         return;
       }
 
-      await this.emprestimoService.createEmprestimo({
+      const emprestimoCriado = await this.emprestimoService.createEmprestimo({
         professor: professor._id,
         sala: reserva.sala,
         horarioEmprestimo: Date.now()
@@ -66,8 +71,32 @@ export class ReservaConsumer {
       console.log(`Sala ${reserva.sala} emprestada`);
 
       this.clientMQTT.publish(this.baseTopic + "/liberar", reserva.sala);
+      this.sendWebsocketMessage('liberar', {
+        sala: emprestimoCriado.sala,
+        horarioEmprestimo: emprestimoCriado.horarioEmprestimo,
+        professor: {
+          _id: professor._id,
+          nome: professor.nome
+        }
+      });
     }catch(error) {
       throw error;
     }
+  }
+
+  addSocket(socket) {
+    this.sockets[socket.id] = socket;
+  }
+
+  removeSocket(socket) {
+    delete this.sockets[socket.id];
+  }
+
+  sendWebsocketMessage(topic, message) {
+    console.log(topic, message);
+
+    Object.values(this.sockets).forEach(socket => {
+      socket.emit(topic, message);
+    });
   }
 }

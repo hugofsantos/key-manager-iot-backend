@@ -29,7 +29,7 @@ export class EmprestimoService {
 
   async createEmprestimo(emprestimo) {
     try{
-      this.emprestimoRepository.writeOne(emprestimo);
+      return await this.emprestimoRepository.writeOne(emprestimo);
     }catch(error) {
       throw error;
     }
