@@ -1,4 +1,5 @@
 import express from 'express';
+import { emprestimoController } from './modules/emprestimo/index.js';
 import {professorController} from './modules/professor/index.js';
 import {reservaController} from './modules/reserva/index.js';
 
@@ -11,5 +12,9 @@ routes.post(professorController.base, (req, res) => professorController.postProf
 // Reserva
 routes.get(reservaController.base, (req, res) => reservaController.getReservas(req, res));
 routes.post(reservaController.base, (req, res) => reservaController.postReserva(req, res));
+
+
+// Emprestimos
+routes.get(emprestimoController.base + "/pendings", (req, res) => emprestimoController.getPendings(req, res));
 
 export default routes;

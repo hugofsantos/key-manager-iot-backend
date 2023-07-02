@@ -23,14 +23,19 @@ export class EmprestimoRepository {
 
   async findPendings(filters) {
     try {
-      const { inicio, fim, sala } = filters;
+      const { inicio, fim, sala, comProfessor } = filters;
 
-      return await this.model.find({
-        ... ((inicio || inicio === 0) && {horarioEmprestimo: {$gte: inicio}}),
+      const findObj = {
+        ... ((inicio || inicio === 0) && { horarioEmprestimo: { $gte: inicio } }),
         ... ((fim || fim === 0) && { horarioEmprestimo: { $lte: fim } }),
-        ... (sala && {sala}),
+        ... (sala && { sala }),
         horarioDevolucao: null
-      });
+      }
+
+      if(comProfessor)
+        return await this.model.find(findObj).populate('professor').exec();
+        
+      return await this.model.find(findObj);
     }catch(error) {
       throw error;
     }    
