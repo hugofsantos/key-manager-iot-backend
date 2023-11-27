@@ -1,7 +1,7 @@
 import express from 'express';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
-
+import cors from 'cors';
 import * as dotenv from 'dotenv'
 import connectToDatabase from './configs/mongoose.js';
 import routes from './routes.js';
@@ -13,24 +13,14 @@ connectToDatabase(process.env.MONGO_HOST, process.env.MONGO_PORT, process.env.MO
 
 const app = express();
 
-app.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', `http://${process.env.ORIGIN_HOST}:${process.env.ORIGIN_PORT}`);
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Access-Control-Allow-Credentials', true);
-  next();
-});
-
+app.use(cors());
 app.use(express.json());
 app.use(routes);
 
 const server = http.createServer(app);
 const io = new SocketIOServer(server, {
   cors: {
-    origin: `http://${process.env.ORIGIN_HOST}:${process.env.ORIGIN_PORT}`,
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type"],
-    credentials: true,
+    credentials: false
   }
 });
 
