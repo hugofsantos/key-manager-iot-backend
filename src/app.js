@@ -37,6 +37,12 @@ server.listen(process.env.APP_PORT, async () => {
   io.on('connection', socket => {
     console.log('Novo cliente Websocket conectado.');
 
+    // Evento para receber "pings" do cliente
+    socket.on('ping', () => {
+      console.log('PONG');
+      socket.emit('pong'); // Responder ao cliente com um "pong"
+    });    
+
     // Armazena o socket conectado
     reservaConsumer.addSocket(socket);
 
