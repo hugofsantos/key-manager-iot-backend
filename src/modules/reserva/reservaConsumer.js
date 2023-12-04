@@ -18,18 +18,24 @@ export class ReservaConsumer {
     this.clientMQTT.on('connect', () => console.log('Conectado ao broker MQTT pelo reservaConsumer'));
     
     this.clientMQTT.subscribe(this.baseTopic + '/rfid');
-    
+    this.clientMQTT.subscribe(this.baseTopic + '/cadastrar');
   
     this.clientMQTT.on('message', (topic, message) => {
-      if (topic === this.baseTopic + '/rfid')
-        this.#onMessageRFID(message.toString());
+      if (topic === this.baseTopic + '/cadastrar') this.#onMessageCadastrar(message.toString());
+      if (topic === this.baseTopic + '/rfid') this.#onMessageRFID(message.toString());
     });
+  }
+
+  async #onMessageCadastrar(rfid) {
+    try{
+      this.sendWebsocketMessage('cadastrar', rfid);
+    }catch(e) {
+      console.error(e.message);
+    }
   }
 
   async #onMessageRFID(rfid) {
     try{
-      this.sendWebsocketMessage('rfid', rfid);
-
       const [professor] = await this.professorService.findProfessors({uid: rfid});
 
       if(!professor) {
