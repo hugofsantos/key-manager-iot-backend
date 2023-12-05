@@ -15,7 +15,7 @@ export class EmprestimoRepository {
 
   async getLastEmprestimoByProfessorId(professor) {
     try {
-      return (await this.model.find({professor}).sort('-horarioEmprestimo').limit(1))[0];
+      return (await this.model.find({professor}).sort('-horarioSolicitacao').limit(1))[0];
     }catch(error) {
       throw error;
     }
@@ -26,9 +26,10 @@ export class EmprestimoRepository {
       const { inicio, fim, sala, comProfessor } = filters;
 
       const findObj = {
-        ... ((inicio || inicio === 0) && { horarioEmprestimo: { $gte: inicio } }),
-        ... ((fim || fim === 0) && { horarioEmprestimo: { $lte: fim } }),
+        ... ((inicio || inicio === 0) && { horarioSolicitacao: { $gte: inicio } }),
+        ... ((fim || fim === 0) && { horarioSolicitacao: { $lte: fim } }),
         ... (sala && { sala }),
+        horarioEmprestimo: {$ne: null}, // Se o horário de empréstimo não for nulo
         horarioDevolucao: null
       }
 
@@ -39,6 +40,38 @@ export class EmprestimoRepository {
     }catch(error) {
       throw error;
     }    
+  }
+
+  async findLastByRoom(room) {
+    try {
+      const last = (await this.model.find({sala: room}).sort('-horarioSolicitacao').limit(1))[0];
+
+      return last || null;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async updateEmprestimo(emprestimo) {
+    try {
+      const {_id, professor, sala, horarioSolicitacao, horarioDevolucao, horarioEmprestimo} = emprestimo;
+
+      return await this.model.findOneAndUpdate(
+        {_id }, 
+        {
+          $set: {
+            professor,
+            sala,
+            horarioSolicitacao,
+            horarioDevolucao,
+            horarioEmprestimo
+          }
+        },
+        {new: true}
+      );
+    } catch (error) {
+      throw error;
+    }
   }
 
   async updateHorarioDevolucao(id) {

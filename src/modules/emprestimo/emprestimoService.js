@@ -34,4 +34,32 @@ export class EmprestimoService {
       throw error;
     }
   }
+
+  async giveBackRoom(room) {
+    try {
+      const emprestimo = await this.emprestimoRepository.findLastByRoom(room);
+
+      if(emprestimo == null || emprestimo.horarioEmprestimo == null) throw new Error('Essa sala não foi emprestada!');
+      if(emprestimo.horarioDevolucao != null) throw new Error('Essa sala já foi devolvida');
+
+      emprestimo.horarioDevolucao = Date.now();
+      return await this.emprestimoRepository.updateEmprestimo(emprestimo);
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async giveRoom(room) {
+    try{
+      const emprestimo = await this.emprestimoRepository.findLastByRoom(room);
+
+      if(emprestimo == null) throw new Error('O empréstimo dessa sala não foi solicitado');
+      if(emprestimo.horarioEmprestimo != null) throw new Error('Essa sala já foi emprestada');
+
+      emprestimo.horarioEmprestimo = Date.now();
+      return await this.emprestimoRepository.updateEmprestimo(emprestimo);
+    }catch(error) {
+      throw error;
+    }
+  } 
 }

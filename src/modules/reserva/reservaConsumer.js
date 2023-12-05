@@ -45,12 +45,13 @@ export class ReservaConsumer {
 
       const lastEmprestimo = await this.emprestimoService.getLastEmprestimoByProfessorId(professor._id);
 
-      if(lastEmprestimo?.horarioDevolucao === null){
-        console.log(`Sala ${lastEmprestimo.sala} devolvida`);
+      if(lastEmprestimo?.horarioEmprestimo != null && lastEmprestimo?.horarioDevolucao === null){
+        // SOLICITAR DEVOLUÇÃO DA SALA
+        console.log(`SOLICITAÇÃO PARA DEVOLVER A SALA ${lastEmprestimo.sala}`);
 
-        this.clientMQTT.publish(this.baseTopic + '/trancar', lastEmprestimo.sala);
-        this.emprestimoService.updateHorarioDevolucao(lastEmprestimo._id);
-        this.sendWebsocketMessage('trancar', lastEmprestimo.sala);
+        this.clientMQTT.publish(this.baseTopic + '/solicitar_devolucao', lastEmprestimo.sala);
+        //this.emprestimoService.updateHorarioDevolucao(lastEmprestimo._id);
+        this.sendWebsocketMessage('solicitar', lastEmprestimo.sala);
         return;
       }
 
@@ -71,20 +72,21 @@ export class ReservaConsumer {
       const emprestimoCriado = await this.emprestimoService.createEmprestimo({
         professor: professor._id,
         sala: reserva.sala,
-        horarioEmprestimo: Date.now()
+        horarioSolicitacao: Date.now()
       });
 
-      console.log(`Sala ${reserva.sala} emprestada`);
+      console.log(`SALA ${reserva.sala} SOLICITADA`);
 
-      this.clientMQTT.publish(this.baseTopic + "/liberar", reserva.sala);
-      this.sendWebsocketMessage('liberar', {
-        sala: emprestimoCriado.sala,
-        horarioEmprestimo: emprestimoCriado.horarioEmprestimo,
-        professor: {
-          _id: professor._id,
-          nome: professor.nome
-        }
-      });
+      this.clientMQTT.publish(this.baseTopic + "/solicitar_retirada", reserva.sala);
+      this.sendWebsocketMessage('solicitar', reserva.sala);
+      // this.sendWebsocketMessage('liberar', {
+      //   sala: emprestimoCriado.sala,
+      //   horarioEmprestimo: emprestimoCriado.horarioEmprestimo,
+      //   professor: {
+      //     _id: professor._id,
+      //     nome: professor.nome
+      //   }
+      // });
     }catch(error) {
       throw error;
     }

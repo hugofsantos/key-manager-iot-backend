@@ -14,4 +14,28 @@ export class EmprestimoController {
       res.status(500).json(error);
     }
   }
+
+  async giveRoom(req, res) {
+    try {
+      const {room} = req.query;
+
+      const emprestimo = await this.emprestimoService.giveRoom(room);
+
+      return res.status(200).json(emprestimo);
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
+
+  async giveBackRoom(req, res) {
+    try {
+      const { room } = req.query;
+      console.log('ENTROU', room);
+      const emprestimo = await this.emprestimoService.giveBackRoom(room);
+
+      return res.status(200).json(emprestimo);
+    } catch (error) {
+      res.status(500).json(error);
+    }
+  }
 }

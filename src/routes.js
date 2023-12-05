@@ -16,5 +16,7 @@ routes.post(reservaController.base, (req, res) => reservaController.postReserva(
 
 // Emprestimos
 routes.get(emprestimoController.base + "/pendings", (req, res) => emprestimoController.getPendings(req, res));
+routes.put(emprestimoController.base + '/give-room', (req, res) => emprestimoController.giveRoom(req, res));
+routes.put(emprestimoController.base + '/give-back-room', (req, res) => emprestimoController.giveBackRoom(req, res));
 
 export default routes;
