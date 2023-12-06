@@ -39,6 +39,7 @@ export class ReservaConsumer {
       const [professor] = await this.professorService.findProfessors({uid: rfid});
 
       if(!professor) {
+        this.clientMQTT.publish(this.baseTopic + '/erro', 'UNKNOWN_RFID');
         console.error('Não têm nenhum professor cadastrado com esse código RFID!' + rfid);
         return;
       }
@@ -60,6 +61,7 @@ export class ReservaConsumer {
       const reserva = await this.reservaService.getReserva(professor._id);
       
       if(!reserva) {
+        this.clientMQTT.publish(this.baseTopic + '/erro', 'NO_RESERVATION');
         console.error('Esse professor não têm reserva nesse horário!');
         return;
       }
@@ -103,5 +105,10 @@ export class ReservaConsumer {
     Object.values(this.sockets).forEach(socket => {
       socket.emit(topic, message);
     });
+  }
+
+  publicMQTTMessage(topic, message) {
+    this.clientMQTT.publish(this.baseTopic + topic, message);
+
   }
 }

@@ -75,6 +75,7 @@ export class EmprestimoService {
     try {
       const emprestimo = await this.emprestimoRepository.getEmprestimoById(emprestimoId, true);
 
+      reservaConsumer.publicMQTTMessage(`/${event}`, emprestimo.sala);
       reservaConsumer.sendWebsocketMessage(event, emprestimo);
     } catch (error) {
       console.error(error);
