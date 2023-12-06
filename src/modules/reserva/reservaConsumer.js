@@ -50,8 +50,10 @@ export class ReservaConsumer {
         console.log(`SOLICITAÇÃO PARA DEVOLVER A SALA ${lastEmprestimo.sala}`);
 
         this.clientMQTT.publish(this.baseTopic + '/solicitar_devolucao', lastEmprestimo.sala);
-        //this.emprestimoService.updateHorarioDevolucao(lastEmprestimo._id);
-        this.sendWebsocketMessage('solicitar', lastEmprestimo.sala);
+        this.sendWebsocketMessage('solicitar', {
+          borrower: professor.nome,
+          room: lastEmprestimo.sala           
+        });
         return;
       }
 
@@ -78,15 +80,10 @@ export class ReservaConsumer {
       console.log(`SALA ${reserva.sala} SOLICITADA`);
 
       this.clientMQTT.publish(this.baseTopic + "/solicitar_retirada", reserva.sala);
-      this.sendWebsocketMessage('solicitar', reserva.sala);
-      // this.sendWebsocketMessage('liberar', {
-      //   sala: emprestimoCriado.sala,
-      //   horarioEmprestimo: emprestimoCriado.horarioEmprestimo,
-      //   professor: {
-      //     _id: professor._id,
-      //     nome: professor.nome
-      //   }
-      // });
+      this.sendWebsocketMessage('solicitar', {
+        borrower: professor.nome,
+        room: reserva.sala 
+      });
     }catch(error) {
       throw error;
     }

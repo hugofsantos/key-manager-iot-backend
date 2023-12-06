@@ -1,3 +1,4 @@
+import { reservaConsumer } from './modules/reserva/index.js';
 import express from 'express';
 import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
@@ -5,7 +6,6 @@ import cors from 'cors';
 import * as dotenv from 'dotenv'
 import connectToDatabase from './configs/mongoose.js';
 import routes from './routes.js';
-import { reservaConsumer } from './modules/reserva/index.js';
 dotenv.config();
 
 connectToDatabase(process.env.MONGO_HOST, process.env.MONGO_PORT, process.env.MONGO_DATABASE)

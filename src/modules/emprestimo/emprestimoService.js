@@ -1,3 +1,5 @@
+import { reservaConsumer } from "../reserva/index.js";
+
 export class EmprestimoService {
   constructor(emprestimoRepository) {
     this.emprestimoRepository = emprestimoRepository;
@@ -43,7 +45,10 @@ export class EmprestimoService {
       if(emprestimo.horarioDevolucao != null) throw new Error('Essa sala já foi devolvida');
 
       emprestimo.horarioDevolucao = Date.now();
-      return await this.emprestimoRepository.updateEmprestimo(emprestimo);
+      const newEmprestimo = await this.emprestimoRepository.updateEmprestimo(emprestimo); 
+
+      this.#sendConfirmation(emprestimo._id, 'devolucao');
+      return newEmprestimo;
     } catch (error) {
       throw error;
     }
@@ -57,9 +62,22 @@ export class EmprestimoService {
       if(emprestimo.horarioEmprestimo != null) throw new Error('Essa sala já foi emprestada');
 
       emprestimo.horarioEmprestimo = Date.now();
-      return await this.emprestimoRepository.updateEmprestimo(emprestimo);
+      const newEmprestimo = await this.emprestimoRepository.updateEmprestimo(emprestimo);
+
+      this.#sendConfirmation(emprestimo._id, 'retirada');
+      return newEmprestimo;
     }catch(error) {
       throw error;
     }
   } 
+
+  async #sendConfirmation(emprestimoId, event) {
+    try {
+      const emprestimo = await this.emprestimoRepository.getEmprestimoById(emprestimoId, true);
+
+      reservaConsumer.sendWebsocketMessage(event, emprestimo);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 }

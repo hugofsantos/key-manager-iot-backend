@@ -13,6 +13,18 @@ export class EmprestimoRepository {
     }
   }
 
+  async getEmprestimoById(id, populate) {
+    try {
+      if(populate) {
+        return await this.model.findById(id).populate('professor');
+      }
+
+      return await this.model.findById(id);
+    } catch (error) {
+      throw error;
+    }
+  }
+
   async getLastEmprestimoByProfessorId(professor) {
     try {
       return (await this.model.find({professor}).sort('-horarioSolicitacao').limit(1))[0];
